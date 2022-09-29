@@ -1,7 +1,13 @@
 package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
+import com.accantosystems.stratoss.common.utils.LoggingUtils;
+import com.accantosystems.stratoss.vnfmdriver.model.MessageDirection;
+import com.accantosystems.stratoss.vnfmdriver.model.MessageType;
 import org.etsi.sol003.granting.Grant;
 import org.etsi.sol003.granting.GrantRequest;
 import org.slf4j.Logger;
@@ -39,11 +45,13 @@ public class GrantController {
     @ApiOperation(value = "Requests a grant for a particular VNF lifecycle operation.", code = 201)
     public ResponseEntity<Grant> requestGrant(@RequestBody GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant request:\n{}", grantRequest);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(grantRequest != null ? grantRequest.toString() : null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION) ,null);
         GrantCreationResponse grantCreationResponse = grantService.requestGrant(grantRequest);
 
         final ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
         URI location = uriBuilder.path(GRANT_LOCATION).buildAndExpand(grantCreationResponse.getGrantId()).toUri();
+        LoggingUtils.logEnabledMDC(grantCreationResponse.getGrant() != null ? grantCreationResponse.getGrant().toString() : null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",null,null);
 
         if (grantCreationResponse.getGrant() != null) {
             return ResponseEntity.created(location).body(grantCreationResponse.getGrant());
@@ -56,9 +64,10 @@ public class GrantController {
     @ApiOperation(value = "Reads a grant", notes = "Returns a previously created grant resource if a granting decision has been made.")
     public ResponseEntity<Grant> getGrant(@PathVariable String grantId) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant fetch for id [{}]", grantId);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(grantId, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION) ,null);
         Grant grant = grantService.getGrant(grantId);
-
+        LoggingUtils.logEnabledMDC(grant != null ? grant.toString() : null, MessageType.RESPONSE,MessageDirection.SENT,grantId ,MediaType.APPLICATION_JSON.toString(), "https",null,null);
         if (grant != null) {
             return ResponseEntity.ok(grant);
         } else {
@@ -66,4 +75,9 @@ public class GrantController {
         }
     }
 
+    Map<String,Object> getRequestProtocolMetaData(String url){
+        Map<String,Object> protocolMetadata=new HashMap<>();
+        protocolMetadata.put("url",url);
+        return protocolMetadata;
+    }
 }
