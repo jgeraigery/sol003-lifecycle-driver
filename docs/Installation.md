@@ -27,7 +27,7 @@ oc get secret sol003-lifecycle-driver-tls -o 'go-template={{index .data "tls.crt
 The following command will onboard the VNFM Driver into into CP4NA environment called 'dev01':
 
 ```bash
-lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01 --certificate sol003-lifecycle-tls.pem
+lmctl resourcedriver add --type sol003 --url https://sol003-lifecycle-driver:8296 dev01 --certificate sol003-lifecycle-tls.pem
 ```
 
 ## Create route for sol003

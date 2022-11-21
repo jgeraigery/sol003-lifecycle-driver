@@ -23,7 +23,9 @@ import com.accantosystems.stratoss.vnfmdriver.model.GrantCreationResponse;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantService;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+
+
 
 @RestController("GrantController")
 @RequestMapping(GrantController.GRANTS_ENDPOINT)
@@ -42,7 +44,7 @@ public class GrantController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Requests a grant for a particular VNF lifecycle operation.", code = 201)
+    @Operation(summary = "Requests a grant for a particular VNF lifecycle operation.")
     public ResponseEntity<Grant> requestGrant(@RequestBody GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant request:\n{}", grantRequest);
         UUID uuid = UUID.randomUUID();
@@ -61,7 +63,7 @@ public class GrantController {
     }
 
     @GetMapping(path = { "/{grantId}" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Reads a grant", notes = "Returns a previously created grant resource if a granting decision has been made.")
+    @Operation(summary = "Reads a grant", description = "Returns a previously created grant resource if a granting decision has been made.")
     public ResponseEntity<Grant> getGrant(@PathVariable String grantId) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant fetch for id [{}]", grantId);
         UUID uuid = UUID.randomUUID();

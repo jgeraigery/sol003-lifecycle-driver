@@ -8,8 +8,7 @@ import org.etsi.sol003.common.ResourceHandle;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -18,26 +17,26 @@ import lombok.Data;
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(description = "Links to resources related to this notification.")
+@Schema(description = "Links to resources related to this notification.")
 public class VnfcResourceInfo {
 
-    @ApiModelProperty(name = "Id", required = true, notes = "Identifier of this VnfcResourceInfo instance.")
+    @Schema(name = "Id", required = true, description = "Identifier of this VnfcResourceInfo instance.")
     private String id;
-    @ApiModelProperty(name = "VDU Id", required = true, notes = "Reference to the applicable VDU in the VNFD.")
+    @Schema(name = "VDU Id", required = true, description = "Reference to the applicable VDU in the VNFD.")
     private String vduId;
-    @ApiModelProperty(name = "VnfdId", notes = "Shall be present in case the value differs from the vnfdId attribute of the VnfInstance (e.g. during a \"Change current VNF package\" operation or due to its final failure).")
+    @Schema(name = "VnfdId", description = "Shall be present in case the value differs from the vnfdId attribute of the VnfInstance (e.g. during a \"Change current VNF package\" operation or due to its final failure).")
     private String vnfdId;
-    @ApiModelProperty(name = "Compute Resource", required = true, notes = "Reference to the VirtualCompute resource.")
+    @Schema(name = "Compute Resource", required = true, description = "Reference to the VirtualCompute resource.")
     private ResourceHandle computeResource;
-    @ApiModelProperty(name = "ZoneId", notes = "The identifier of the resource zone, as managed by the resource management layer (typically, the VIM), where the referenced VirtualStorage resource is placed. Shall be provided if this information is available from the VIM.")
+    @Schema(name = "ZoneId", description = "The identifier of the resource zone, as managed by the resource management layer (typically, the VIM), where the referenced VirtualStorage resource is placed. Shall be provided if this information is available from the VIM.")
     private String zoneId;
-    @ApiModelProperty(name = "Storage Resource Ids", notes = "References to the VirtualStorage resources. The value refers to a VirtualStorageResourceInfo item in the VnfInstance.")
+    @Schema(name = "Storage Resource Ids", description = "References to the VirtualStorage resources. The value refers to a VirtualStorageResourceInfo item in the VnfInstance.")
     private List<String> storageResourceIds;
-    @ApiModelProperty(name = "Reservation Id", notes = "The reservation identifier applicable to the resource. It shall be present when an applicable reservation exists.")
+    @Schema(name = "Reservation Id", description = "The reservation identifier applicable to the resource. It shall be present when an applicable reservation exists.")
     private String reservationId;
-    @ApiModelProperty(name = "VNFC Connection Point Information", notes = "CPs of the VNFC instance. Shall be present when that particular CP of the VNFC instance is associated to an external CP of the VNF instance. May be present otherwise.")
+    @Schema(name = "VNFC Connection Point Information", description = "CPs of the VNFC instance. Shall be present when that particular CP of the VNFC instance is associated to an external CP of the VNF instance. May be present otherwise.")
     private List<VnfcCpInfo> vnfcCpInfo;
-    @ApiModelProperty(name = "Metadata", notes = "Metadata about this resource.")
+    @Schema(name = "Metadata", description = "Metadata about this resource.")
     private Map<String, String> metadata;
 
     /**
@@ -46,22 +45,22 @@ public class VnfcResourceInfo {
     @Data
     @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @ApiModel(description = "Represents VNFC Connection Point Information.")
+    @Schema(description = "Represents VNFC Connection Point Information.")
     public static class VnfcCpInfo {
 
-        @ApiModelProperty(name = "Id", required = true, notes = "Identifier of this VNFC CP instance and the associated array entry.")
+        @Schema(name = "Id", required = true, description = "Identifier of this VNFC CP instance and the associated array entry.")
         private String id;
-        @ApiModelProperty(name = "CPD Id", required = true, notes = "Identifier of the VDU CPD, cpdId, in the VNFD.")
+        @Schema(name = "CPD Id", required = true, description = "Identifier of the VDU CPD, cpdId, in the VNFD.")
         private String cpdId;
-        @ApiModelProperty(name = "VNF External Connection Point Id", notes = "When the VNFC CP is exposed as external CP of the VNF, the identifier of this external VNF CP.")
+        @Schema(name = "VNF External Connection Point Id", description = "When the VNFC CP is exposed as external CP of the VNF, the identifier of this external VNF CP.")
         private String vnfExtCpId;
-        @ApiModelProperty(name = "Connection Point Protocol Information", notes = "Network protocol information for this CP.")
+        @Schema(name = "Connection Point Protocol Information", description = "Network protocol information for this CP.")
         private List<CpProtocolInfo> cpProtocolInfo;
-        @ApiModelProperty(name = "VNF Link Port Id", notes = "Identifier of the \"vnfLinkPorts\" structure in the \"vnfVirtualLinkResourceInfo\" structure. Shall be present if the CP is associated to a link port.")
+        @Schema(name = "VNF Link Port Id", description = "Identifier of the \"vnfLinkPorts\" structure in the \"vnfVirtualLinkResourceInfo\" structure. Shall be present if the CP is associated to a link port.")
         private String vnfLinkPortId;
-        @ApiModelProperty(name = "Parent Cp Id", notes = "Identifier of another VNFC CP instance that corresponds to the parent port of a trunk that the present VNFC CP instance participates in.")
+        @Schema(name = "Parent Cp Id", description = "Identifier of another VNFC CP instance that corresponds to the parent port of a trunk that the present VNFC CP instance participates in.")
         private String parentCpId;
-        @ApiModelProperty(name = "Metadata", notes = "Metadata about this CP.")
+        @Schema(name = "Metadata", description = "Metadata about this CP.")
         private Map<String, String> metadata;
 
     }

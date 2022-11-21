@@ -20,7 +20,9 @@ import org.etsi.sol003.lifecyclemanagement.LifecycleManagementNotification;
 import org.etsi.sol003.lifecyclemanagement.VnfLcmOperationOccurenceNotification;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+
+
 
 @RestController("LifecycleNotificationController")
 @RequestMapping("/vnflcm/v2/notifications")
@@ -36,7 +38,7 @@ public class LifecycleNotificationController {
     }
 
     @PostMapping
-    @ApiOperation(value = "Receives a lifecycle operation occurrence notification from a VNFM", code = 204)
+    @Operation(summary  = "Receives a lifecycle operation occurrence notification from a VNFM")
     public ResponseEntity<Void> receiveNotification(@RequestBody LifecycleManagementNotification notification) {
         // TODO This should be reduced to DEBUG level, but it assists in development testing to see all notification messages being received
         logger.info("Received notification:\n{}", notification);

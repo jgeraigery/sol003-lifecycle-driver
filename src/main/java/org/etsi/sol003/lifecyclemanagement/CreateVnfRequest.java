@@ -5,8 +5,8 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -15,16 +15,16 @@ import lombok.Data;
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(description = "Represents request parameters for the \"Create VNF identifier\" operation.")
+@Schema(description = "Represents request parameters for the \"Create VNF identifier\" operation.")
 public class CreateVnfRequest {
 
-    @ApiModelProperty(name = "VNFD Id", required = true, notes = "Identifier that identifies the VNFD which defines the VNF instance to be created.")
+    @Schema(name = "VNFD Id", required = true, description = "Identifier that identifies the VNFD which defines the VNF instance to be created.")
     private String vnfdId;
-    @ApiModelProperty(name = "VNF Instance Name", notes = "Human-readable name of the VNF instance to be created.")
+    @Schema(name = "VNF Instance Name", description = "Human-readable name of the VNF instance to be created.")
     private String vnfInstanceName;
-    @ApiModelProperty(name = "VNF Instance Description", notes = "Human-readable description of the VNF instance to be created.")
+    @Schema(name = "VNF Instance Description", description = "Human-readable description of the VNF instance to be created.")
     private String vnfInstanceDescription;
-    @ApiModelProperty(name = "meta data", notes = "If present, this attribute provides additional initial values,overriding those obtained from the VNFD, for the \"metadata\" attribute in \"VnfInstance\".")
+    @Schema(name = "meta data", description = "If present, this attribute provides additional initial values,overriding those obtained from the VNFD, for the \"metadata\" attribute in \"VnfInstance\".")
     private Map<String, String> metadata;
 
 }

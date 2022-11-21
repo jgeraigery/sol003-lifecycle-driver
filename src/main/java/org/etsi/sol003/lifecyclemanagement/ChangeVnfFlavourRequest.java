@@ -10,8 +10,7 @@ import org.etsi.sol003.common.VimConnectionInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -20,24 +19,24 @@ import lombok.Data;
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(description = "Represents request parameters for the \"Change VNF flavour\" operation.")
+@Schema(description = "Represents request parameters for the \"Change VNF flavour\" operation.")
 public class ChangeVnfFlavourRequest {
 
-    @ApiModelProperty(name = "New Flavour Id", required = true, notes = "Identifier of the VNF deployment flavour to be instantiated.")
+    @Schema(name = "New Flavour Id", required = true, description = "Identifier of the VNF deployment flavour to be instantiated.")
     private String newFlavourId;
-    @ApiModelProperty(name = "Instantiation Level Id", notes = "Identifier of the instantiation level of the deployment flavour to be instantiated. If not present, the default instantiation level as declared in the VNFD is instantiated.")
+    @Schema(name = "Instantiation Level Id", description = "Identifier of the instantiation level of the deployment flavour to be instantiated. If not present, the default instantiation level as declared in the VNFD is instantiated.")
     private String instantiationLevelId;
-    @ApiModelProperty(name = "External Virtual Link Information", notes = "Information about external VLs to connect the VNF to.")
+    @Schema(name = "External Virtual Link Information", description = "Information about external VLs to connect the VNF to.")
     private List<ExtVirtualLinkData> extVirtualLinks;
-    @ApiModelProperty(name = "External Managed Virtual Link Information", notes = "Information about internal VLs that are managed by the NFVO.")
+    @Schema(name = "External Managed Virtual Link Information", description = "Information about internal VLs that are managed by the NFVO.")
     private List<ExtManagedVirtualLinkData> extManagedVirtualLinks;
-    @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance, or refer to external / externally-managed virtual links. This attribute shall only be supported and may be present if VNF-related resource management in direct mode is applicable.")
+    @Schema(name = "VIM Connection Information", description = "Information about VIM connections to be used for managing the resources for the VNF instance, or refer to external / externally-managed virtual links. This attribute shall only be supported and may be present if VNF-related resource management in direct mode is applicable.")
     private Map<String,VimConnectionInfo> vimConnectionInfo;
-    @ApiModelProperty(name = "Additional Parameters", notes = "Additional input parameters for the flavour change process, specific to the VNF being modified, as declared in the VNFD as part of \"ChangeVnfFlavourOpConfig\".")
+    @Schema(name = "Additional Parameters", description = "Additional input parameters for the flavour change process, specific to the VNF being modified, as declared in the VNFD as part of \"ChangeVnfFlavourOpConfig\".")
     private Map<String, String> additionalParams;
-    @ApiModelProperty(name = "Extensions", notes = "If present, this attribute provides modifications to the values of the \"extensions\" attribute in \"VnfInstance\".")
+    @Schema(name = "Extensions", description = "If present, this attribute provides modifications to the values of the \"extensions\" attribute in \"VnfInstance\".")
     private Map<String, String> extensions;
-    @ApiModelProperty(name = "VNF Configurable Properties", notes = "If present, this attribute provides modifications to the values of the \"vnfConfigurableProperties\" attribute in \"VnfInstance\".")
+    @Schema(name = "VNF Configurable Properties", description = "If present, this attribute provides modifications to the values of the \"vnfConfigurableProperties\" attribute in \"VnfInstance\".")
     private Map<String, String> vnfConfigurableProperties;
 
 }

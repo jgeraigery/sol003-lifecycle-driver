@@ -25,7 +25,8 @@ import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
 import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+
 
 @RestController("PackageManagementController")
 @RequestMapping("/vnfpkgm/v1/vnf_packages")
@@ -47,7 +48,7 @@ public class PackageManagementController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Query VNF packages information.", notes = "Queries the information of the VNF packages matching the filter.")
+    @Operation(summary  = "Query VNF packages information.", description = "Queries the information of the VNF packages matching the filter.")
     public ResponseEntity<List<VnfPkgInfo>> queryVnfPackages(@RequestParam(value = "filter", required = false) String filter,
                                                              @RequestParam(value = "all_fields", required = false) String allFields,
                                                              @RequestParam(value = "fields", required = false) String fields,
@@ -66,7 +67,7 @@ public class PackageManagementController {
     }
 
     @GetMapping(path = "/{vnfPkgId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Reads the information of an individual VNF package", notes = "This resource represents an individual VNF package. The client can use this resource to read information of the VNF package.")
+    @Operation(summary  = "Reads the information of an individual VNF package", description = "This resource represents an individual VNF package. The client can use this resource to read information of the VNF package.")
     public ResponseEntity<VnfPkgInfo> getVnfPackage(@PathVariable String vnfPkgId) throws VNFPackageNotFoundException {
         logger.info("Received Individual VNF package Info Get request.");
 
@@ -76,7 +77,7 @@ public class PackageManagementController {
     }
 
     @GetMapping(path = "/{vnfPkgId}/vnfd", produces = { MediaType.TEXT_PLAIN_VALUE, CONTENT_TYPE_APPLICATION_ZIP })
-    @ApiOperation(value = "Reads the content of the VNFD within a VNF package.", notes = "This resource represents the VNFD contained in an on-boarded VNF package. The client can use this resource to obtain the content of the VNFD.")
+    @Operation(summary  = "Reads the content of the VNFD within a VNF package.", description = "This resource represents the VNFD contained in an on-boarded VNF package. The client can use this resource to obtain the content of the VNFD.")
     public ResponseEntity<?> getVnfd(@RequestHeader("Accept") List<String> acceptHeader, @PathVariable String vnfPkgId) throws VNFPackageNotFoundException {
 
         logger.info("Received VNFD Get request for package id [{}]", vnfPkgId);
@@ -119,7 +120,7 @@ public class PackageManagementController {
     }
 
     @GetMapping(path = "/{vnfPkgId}/package_content", produces = { CONTENT_TYPE_APPLICATION_ZIP })
-    @ApiOperation(value = "Reads the content of a VNF package identified by the VNF package identifier allocated by the NFVO.", notes = "This resource represents a VNF package identified by the VNF package identifier allocated by the NFVO. The client can use this resource to fetch the content of the VNF package.")
+    @Operation(summary  = "Reads the content of a VNF package identified by the VNF package identifier allocated by the NFVO.", description = "This resource represents a VNF package identified by the VNF package identifier allocated by the NFVO. The client can use this resource to fetch the content of the VNF package.")
     public ResponseEntity<Resource> getVnfPackageContent(@RequestHeader(value = "Content-Range", required = false) String contentRange,
                                                          @PathVariable String vnfPkgId) throws PackageStateConflictException,
                                                                                                ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
@@ -137,7 +138,7 @@ public class PackageManagementController {
     // The actual mapping we want is "/{vnfPkgId}/artifacts/{artifactPath}" but it's not possible to match on this when the artifact path contains "/" characters (even when encoded)
     // This path filter seems to be the only way to match on these URLs - https://stackoverflow.com/questions/51108291
     @GetMapping(path = { "/{vnfPkgId}/artifacts/**" })
-    @ApiOperation(value = "Reads the content content of an artifact within a VNF package.", notes = "This resource represents an individual artifact contained in a VNF package. The client can use this resource to fetch the content of the artifact.")
+    @Operation(summary  = "Reads the content content of an artifact within a VNF package.", description = "This resource represents an individual artifact contained in a VNF package. The client can use this resource to fetch the content of the artifact.")
     public ResponseEntity<Resource> getVnfPackageArtifact(@RequestHeader(value = "Content-Range", required = false) String contentRange, @PathVariable String vnfPkgId,
                                                           HttpServletRequest request) throws PackageStateConflictException, ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
 

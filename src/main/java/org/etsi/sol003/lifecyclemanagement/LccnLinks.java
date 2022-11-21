@@ -5,8 +5,7 @@ import org.etsi.sol003.common.NotificationLink;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -15,14 +14,14 @@ import lombok.Data;
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(description = "Represents the links to resources that a notification can contain.")
+@Schema(description = "Represents the links to resources that a notification can contain.")
 public class LccnLinks {
 
-    @ApiModelProperty(name = "vnfInstance", required = true, notes = "Link to the resource representing the VNF instance to which the notified change applies.")
+    @Schema(name = "vnfInstance", required = true, description = "Link to the resource representing the VNF instance to which the notified change applies.")
     private NotificationLink vnfInstance;
-    @ApiModelProperty(name = "subscription", required = true, notes = "Link to the related subscription.")
+    @Schema(name = "subscription", required = true, description = "Link to the related subscription.")
     private NotificationLink subscription;
-    @ApiModelProperty(name = "vnfLcmOpOcc", notes = "Link to the VNF lifecycle management operation occurrence that this notification is related to. Shall be present if there is a related lifecycle operation occurrence.")
+    @Schema(name = "vnfLcmOpOcc", description = "Link to the VNF lifecycle management operation occurrence that this notification is related to. Shall be present if there is a related lifecycle operation occurrence.")
     private NotificationLink vnfLcmOpOcc;
 
 }

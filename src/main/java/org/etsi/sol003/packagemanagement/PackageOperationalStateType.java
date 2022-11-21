@@ -1,6 +1,6 @@
 package org.etsi.sol003.packagemanagement;
 
-import io.swagger.annotations.ApiModelProperty;
+
 
 /**
  * Operational state of the on-boarded instance of the VNF package.

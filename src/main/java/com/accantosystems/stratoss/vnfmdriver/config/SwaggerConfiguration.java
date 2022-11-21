@@ -1,31 +1,15 @@
 package com.accantosystems.stratoss.vnfmdriver.config;
 
-import static springfox.documentation.builders.PathSelectors.regex;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.ResponseEntity;
 
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/**
- * Springfox Swagger configuration.
- * <p>
- * Warning! When having a lot of REST endpoints, Springfox can become a performance issue. In that case, you can use a
- * specific Spring profile for this class, so that only front-end developers have access to the Swagger view.
- */
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+
+
 @Configuration
-@EnableSwagger2
-@Import(springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration.class)
 public class SwaggerConfiguration {
 
     @Value("${info.app.name:VNFM Driver}")
@@ -40,31 +24,16 @@ public class SwaggerConfiguration {
     @Value("${info.contact.name:Accanto Systems Ltd}")
     private String contactName;
 
-    private final Logger logger = LoggerFactory.getLogger(SwaggerConfiguration.class);
+   // @Value("${swagger.server-url}")
+    private String serverUrl;
 
-    /**
-     * Swagger Springfox configuration.
-     *
-     * @return the Swagger Springfox configuration
-     */
     @Bean
-    public Docket swaggerSpringfoxDocket() {
-        logger.debug("Starting Swagger");
-        Contact contact = new Contact(contactName, null, null);
-
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title(appName)
-                .description(appDescription)
-                .version(appVersion)
-                .contact(contact)
-                .build();
-
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo)
-                                                      .forCodeGeneration(true)
-                                                      .genericModelSubstitutes(ResponseEntity.class)
-                                                      .select()
-                                                      .paths(regex("/api/.*"))
-                                                      .paths(regex("/vnflcm/.*"))
-                                                      .build();
-    }
+  public OpenAPI springShopOpenAPI() {
+      return new OpenAPI()
+              .info(new Info().title(appName)
+              .description(appDescription)
+              .version(appVersion));
+              
+  }
 }
+    

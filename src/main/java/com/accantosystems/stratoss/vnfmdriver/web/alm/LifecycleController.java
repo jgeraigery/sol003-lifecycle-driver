@@ -21,7 +21,9 @@ import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.service.LifecycleManagementService;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+
+
 
 @RestController("LifecycleController")
 @RequestMapping("/api/driver")
@@ -37,7 +39,7 @@ public class LifecycleController {
     }
 
     @PostMapping("/lifecycle/execute")
-    @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
+    @Operation( summary = "Execute a lifecycle against a VNFM", description = "Initiates a lifecycle against a VNF, managed by a VNFM")
     public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest, HttpServletRequest servletRequest) throws MessageConversionException {
         try (BufferedReader messageReader = servletRequest.getReader()) {
             String rawMessage = messageReader.lines().collect(Collectors.joining("\n"));
@@ -51,7 +53,7 @@ public class LifecycleController {
     }
 
     @PostMapping("/references/find")
-    @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
+    @Operation(summary = "Execute a lifecycle against a VNFM", description = "Initiates a lifecycle against a VNF, managed by a VNFM")
     public ResponseEntity<ExecutionAcceptedResponse> findReference(@RequestBody FindReferenceRequest findReferenceRequest, HttpServletRequest servletRequest) throws MessageConversionException, NotImplementedException {
         throw new NotImplementedException("Find References API is not implemented");
     }
