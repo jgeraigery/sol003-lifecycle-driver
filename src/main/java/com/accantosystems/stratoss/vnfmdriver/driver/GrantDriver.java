@@ -4,7 +4,13 @@ import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
+import com.accantosystems.stratoss.common.utils.LoggingUtils;
+import com.accantosystems.stratoss.vnfmdriver.model.MessageDirection;
+import com.accantosystems.stratoss.vnfmdriver.model.MessageType;
 import org.etsi.sol003.granting.Grant;
 import org.etsi.sol003.granting.GrantRequest;
 import org.slf4j.Logger;
@@ -72,6 +78,15 @@ public class GrantDriver {
 
         final HttpEntity<GrantRequest> requestEntity = new HttpEntity<>(grantRequest, headers);
         final ResponseEntity<Grant> responseEntity;
+        String driverRequestId = "";
+        String grantRequestMsg = "";
+        if(grantRequest != null){
+            driverRequestId = grantRequest.getVnfLcmOpOccId();
+            grantRequestMsg = grantRequest.toString();
+        }
+
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(grantRequestMsg, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(url) ,driverRequestId);
         try {
             responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.POST, requestEntity, Grant.class);
         } catch (SOL003ResponseException e) {
@@ -79,7 +94,7 @@ public class GrantDriver {
         } catch (Exception e) {
             throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s]", url), e);
         }
-
+        LoggingUtils.logEnabledMDC(responseEntity.getBody() != null ? responseEntity.getBody().toString() : null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getProtocolMetaData(url,responseEntity),driverRequestId);
         if (HttpStatus.CREATED.equals(responseEntity.getStatusCode())) {
             // synchronous response - should find grant resource in body
             if (responseEntity.getBody() == null) {
@@ -239,5 +254,24 @@ public class GrantDriver {
             throw new IllegalArgumentException(String.format("Must specify a property value for [%s]", propertyName));
         }
         return property;
+    }
+
+    Map<String,Object> getProtocolMetaData(String url, ResponseEntity responseEntity){
+
+        Map<String,Object> protocolMetadata=new HashMap<>();
+
+        protocolMetadata.put("status",responseEntity.getStatusCode());
+        protocolMetadata.put("status_code",responseEntity.getStatusCodeValue());
+        protocolMetadata.put("url",url);
+
+        return protocolMetadata;
+
+    }
+
+    Map<String,Object> getRequestProtocolMetaData(String url){
+
+        Map<String,Object> protocolMetadata=new HashMap<>();
+        protocolMetadata.put("url",url);
+        return protocolMetadata;
     }
 }

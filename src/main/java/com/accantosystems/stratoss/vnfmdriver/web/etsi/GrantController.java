@@ -48,12 +48,18 @@ public class GrantController {
     public ResponseEntity<Grant> requestGrant(@RequestBody GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant request:\n{}", grantRequest);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(grantRequest != null ? grantRequest.toString() : null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION) ,grantRequest.getVnfLcmOpOccId());
+        String driverRequestId = "";
+        String grantRequestMsg = "";
+        if(grantRequest != null){
+            driverRequestId = grantRequest.getVnfLcmOpOccId();
+            grantRequestMsg = grantRequest.toString();
+        }
+        LoggingUtils.logEnabledMDC(grantRequestMsg, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION) , driverRequestId);
         GrantCreationResponse grantCreationResponse = grantService.requestGrant(grantRequest);
 
         final ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
         URI location = uriBuilder.path(GRANT_LOCATION).buildAndExpand(grantCreationResponse.getGrantId()).toUri();
-        LoggingUtils.logEnabledMDC(grantCreationResponse.getGrant() != null ? grantCreationResponse.getGrant().toString() : null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION),grantRequest.getVnfLcmOpOccId());
+        LoggingUtils.logEnabledMDC(grantCreationResponse.getGrant() != null ? grantCreationResponse.getGrant().toString() : null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION), driverRequestId);
 
         if (grantCreationResponse.getGrant() != null) {
             return ResponseEntity.created(location).body(grantCreationResponse.getGrant());
@@ -67,12 +73,17 @@ public class GrantController {
     public ResponseEntity<Grant> getGrant(@PathVariable String grantId) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant fetch for id [{}]", grantId);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(grantId, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(GRANT_LOCATION) ,null);
+
         Grant grant = grantService.getGrant(grantId);
-        LoggingUtils.logEnabledMDC(grant != null ? grant.toString() : null, MessageType.RESPONSE,MessageDirection.SENT,grantId ,MediaType.APPLICATION_JSON.toString(), "https",null,null);
+        LoggingUtils.logEnabledMDC(grantId, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "https", getRequestProtocolMetaData(GRANT_LOCATION), null);
+        LoggingUtils.logEnabledMDC(grant != null ? grant.toString() : null, MessageType.RESPONSE, MessageDirection.SENT, grantId, MediaType.APPLICATION_JSON.toString(), "https", null, null);
         if (grant != null) {
+            LoggingUtils.logEnabledMDC(grantId, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "https", getRequestProtocolMetaData(GRANT_LOCATION), grant.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(grant != null ? grant.toString() : null, MessageType.RESPONSE, MessageDirection.SENT, grantId, MediaType.APPLICATION_JSON.toString(), "https", null, grant.getVnfLcmOpOccId());
             return ResponseEntity.ok(grant);
         } else {
+            LoggingUtils.logEnabledMDC(grantId, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "https", getRequestProtocolMetaData(GRANT_LOCATION), null);
+            LoggingUtils.logEnabledMDC(grant != null ? grant.toString() : null, MessageType.RESPONSE, MessageDirection.SENT, grantId, MediaType.APPLICATION_JSON.toString(), "https", null, null);
             return ResponseEntity.accepted().build();
         }
     }
