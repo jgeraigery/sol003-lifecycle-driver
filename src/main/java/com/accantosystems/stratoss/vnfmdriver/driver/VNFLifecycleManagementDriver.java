@@ -11,6 +11,7 @@ import java.util.UUID;
 import com.accantosystems.stratoss.common.utils.LoggingUtils;
 import com.accantosystems.stratoss.vnfmdriver.model.MessageDirection;
 import com.accantosystems.stratoss.vnfmdriver.model.MessageType;
+import com.accantosystems.stratoss.vnfmdriver.utils.RequestResponseLogUtils;
 import org.etsi.sol003.lifecyclemanagement.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,9 +104,16 @@ public class VNFLifecycleManagementDriver {
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<String> requestEntity = new HttpEntity<>(createVnfRequest, headers);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(createVnfRequest, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(url) ,driverrequestid);
-        final ResponseEntity<String> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
-        LoggingUtils.logEnabledMDC(responseEntity.getBody(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getProtocolMetaData(url,responseEntity),driverrequestid);
+        LoggingUtils.logEnabledMDC(createVnfRequest, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http", RequestResponseLogUtils.getRequestSentProtocolMetaData(url) ,driverrequestid);
+        final ResponseEntity<String> responseEntity;
+        try {
+            responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
+        } catch (Throwable e){
+            // To log all unknown errors while making external call
+            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value()),driverrequestid);
+            throw e;
+        }
+        LoggingUtils.logEnabledMDC(responseEntity.getBody(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue()),driverrequestid);
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
         return responseEntity.getBody();
@@ -133,9 +141,16 @@ public class VNFLifecycleManagementDriver {
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("vnfInstanceId", vnfInstanceId);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(url) ,driverrequestid);
-        final ResponseEntity<Void> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
-        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getProtocolMetaData(url,responseEntity),driverrequestid);
+        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getRequestSentProtocolMetaData(url) ,driverrequestid);
+        final ResponseEntity<Void> responseEntity;
+        try {
+            responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
+        } catch(Throwable e){
+            // To log all unknown errors while making external call
+            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value()),driverrequestid);
+            throw e;
+        }
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue()),driverrequestid);
         checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
 
@@ -355,8 +370,15 @@ public class VNFLifecycleManagementDriver {
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<String> requestEntity = new HttpEntity<>(operationRequest, headers);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(operationRequest, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(url) ,null);
-        final ResponseEntity<String> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
+        LoggingUtils.logEnabledMDC(operationRequest, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getRequestSentProtocolMetaData(url) ,null);
+        final ResponseEntity<String> responseEntity;
+        try {
+            responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
+        } catch(Throwable e) {
+            // To log all unknown errors while making external call
+            LoggingUtils.logEnabledMDC(null,MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value()),null);
+            throw e;
+        }
         checkResponseEntityMatches(responseEntity, HttpStatus.ACCEPTED, false);
         // "Location" header contains URI of the created VnfLcmOpOcc record
         final URI location = responseEntity.getHeaders().getLocation();
@@ -365,7 +387,7 @@ public class VNFLifecycleManagementDriver {
         }
         // Return the VnfLcmOpOccId, which is the last part of the path
         final String requestId = location.getPath().substring(location.getPath().lastIndexOf("/") + 1);
-        LoggingUtils.logEnabledMDC(responseEntity.getBody(),MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getProtocolMetaData(url,responseEntity),requestId);
+        LoggingUtils.logEnabledMDC(responseEntity.getBody(),MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue()),requestId);
         return requestId;
     }
 
@@ -431,10 +453,10 @@ public class VNFLifecycleManagementDriver {
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<LccnSubscriptionRequest> requestEntity = new HttpEntity<>(lccnSubscriptionRequest, headers);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(lccnSubscriptionRequest.toString(),MessageType.REQUEST, MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(url) ,uuid.toString());
+        LoggingUtils.logEnabledMDC(lccnSubscriptionRequest.toString(),MessageType.REQUEST, MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getRequestSentProtocolMetaData(url) ,uuid.toString());
         final ResponseEntity<LccnSubscription> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation)
                 .exchange(url, HttpMethod.POST, requestEntity, LccnSubscription.class);
-        LoggingUtils.logEnabledMDC(responseEntity.getBody().toString(),MessageType.RESPONSE, MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getProtocolMetaData(url,responseEntity),uuid.toString());
+        LoggingUtils.logEnabledMDC(responseEntity.getBody().toString(),MessageType.RESPONSE, MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue()),uuid.toString());
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
         return responseEntity.getBody();
@@ -492,9 +514,9 @@ public class VNFLifecycleManagementDriver {
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("subscriptionId", subscriptionId);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getRequestProtocolMetaData(url) ,uuid.toString());
+        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getRequestSentProtocolMetaData(url) ,uuid.toString());
         final ResponseEntity<Void> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
-        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",getProtocolMetaData(url,responseEntity),uuid.toString());
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue()),uuid.toString());
         checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
 
@@ -532,24 +554,4 @@ public class VNFLifecycleManagementDriver {
             throw new SOL003ResponseException("No response body expected");
         }
     }
-
-    Map<String,Object> getProtocolMetaData(String url,ResponseEntity responseEntity){
-
-        Map<String,Object> protocolMetadata=new HashMap<>();
-
-        protocolMetadata.put("status",responseEntity.getStatusCode());
-        protocolMetadata.put("status_code",responseEntity.getStatusCodeValue());
-        protocolMetadata.put("url",url);
-
-        return protocolMetadata;
-
-    }
-
-    Map<String,Object> getRequestProtocolMetaData(String url){
-
-        Map<String,Object> protocolMetadata=new HashMap<>();
-        protocolMetadata.put("url",url);
-        return protocolMetadata;
-    }
-
 }

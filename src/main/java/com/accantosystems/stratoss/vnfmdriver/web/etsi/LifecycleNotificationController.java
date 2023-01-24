@@ -6,9 +6,11 @@ import java.util.UUID;
 import com.accantosystems.stratoss.common.utils.LoggingUtils;
 import com.accantosystems.stratoss.vnfmdriver.model.MessageDirection;
 import com.accantosystems.stratoss.vnfmdriver.model.MessageType;
+import com.accantosystems.stratoss.vnfmdriver.utils.RequestResponseLogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -30,11 +32,11 @@ import io.swagger.v3.oas.annotations.Operation;
 
 
 @RestController("LifecycleNotificationController")
-@RequestMapping("/vnflcm/v2/notifications")
+@RequestMapping(LifecycleNotificationController.NOTIFICATIONS_URI)
 public class LifecycleNotificationController {
 
     private final static Logger logger = LoggerFactory.getLogger(LifecycleNotificationController.class);
-
+    public final static String NOTIFICATIONS_URI="/vnflcm/v2/notifications";
     private final ExternalMessagingService externalMessagingService;
 
     @Autowired
@@ -51,7 +53,7 @@ public class LifecycleNotificationController {
 
         if (notification instanceof VnfLcmOperationOccurenceNotification) {
             final VnfLcmOperationOccurenceNotification vnfLcmOpOccNotification = (VnfLcmOperationOccurenceNotification) notification;
-            LoggingUtils.logEnabledMDC(notification.toString(), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "https",null ,vnfLcmOpOccNotification.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(notification.toString(), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http", RequestResponseLogUtils.getRequestReceivedProtocolMetaData(NOTIFICATIONS_URI) ,vnfLcmOpOccNotification.getVnfLcmOpOccId());
             // Send an update if this is completed
             if (vnfLcmOpOccNotification.getNotificationStatus() == VnfLcmOperationOccurenceNotification.NotificationStatus.RESULT){
                 ExecutionAsyncResponse asyncResponse = new ExecutionAsyncResponse(vnfLcmOpOccNotification.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap());
@@ -65,7 +67,7 @@ public class LifecycleNotificationController {
                 }
                 externalMessagingService.sendExecutionAsyncResponse(asyncResponse);
             }
-            LoggingUtils.logEnabledMDC("", MessageType.RESPONSE, MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",null,vnfLcmOpOccNotification.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(notification.toString(), MessageType.RESPONSE, MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.NO_CONTENT.value()),vnfLcmOpOccNotification.getVnfLcmOpOccId());
         }
 
         return ResponseEntity.noContent().build();
