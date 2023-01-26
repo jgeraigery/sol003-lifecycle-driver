@@ -47,7 +47,7 @@ public class LifecycleNotificationController {
         if (notification instanceof VnfLcmOperationOccurenceNotification) {
             final VnfLcmOperationOccurenceNotification vnfLcmOpOccNotification = (VnfLcmOperationOccurenceNotification) notification;
             LoggingUtils.logEnabledMDC(notification.toString(), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(NOTIFICATIONS_URI, HttpMethod.POST.name(), headers) ,vnfLcmOpOccNotification.getVnfLcmOpOccId());
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(NOTIFICATIONS_URI, HttpMethod.POST.name(), headers), vnfLcmOpOccNotification.getVnfLcmOpOccId());
             // Send an update if this is completed
             if (vnfLcmOpOccNotification.getNotificationStatus() == VnfLcmOperationOccurenceNotification.NotificationStatus.RESULT){
                 ExecutionAsyncResponse asyncResponse = new ExecutionAsyncResponse(vnfLcmOpOccNotification.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap());
@@ -61,11 +61,9 @@ public class LifecycleNotificationController {
                 }
                 externalMessagingService.sendExecutionAsyncResponse(asyncResponse);
             }
-            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.NO_CONTENT.value(),HttpStatus.NO_CONTENT.getReasonPhrase(), null),vnfLcmOpOccNotification.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
+                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase(), null), vnfLcmOpOccNotification.getVnfLcmOpOccId());
         }
-
         return ResponseEntity.noContent().build();
     }
-
 }
