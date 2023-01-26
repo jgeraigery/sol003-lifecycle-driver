@@ -12,10 +12,7 @@ import org.etsi.sol003.granting.GrantRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -46,55 +43,57 @@ public class GrantController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Requests a grant for a particular VNF lifecycle operation.")
-    public ResponseEntity<Grant> requestGrant(@RequestBody GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
+    public ResponseEntity<Grant> requestGrant(@RequestBody GrantRequest grantRequest, @RequestHeader HttpHeaders headers) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant request:\n{}", grantRequest);
         UUID uuid = UUID.randomUUID();
         final String driverRequestId;
         if(grantRequest != null){
             driverRequestId = grantRequest.getVnfLcmOpOccId();
             LoggingUtils.logEnabledMDC(grantRequest.toString(), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANTS_ENDPOINT, HttpMethod.POST.name(), null) , driverRequestId);
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANTS_ENDPOINT, HttpMethod.POST.name(), headers) , driverRequestId);
             GrantCreationResponse grantCreationResponse = grantService.requestGrant(grantRequest);
             final ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
             URI location = uriBuilder.path(GRANT_LOCATION).buildAndExpand(grantCreationResponse.getGrantId()).toUri();
+            HttpHeaders responseHeader = new HttpHeaders();
+            responseHeader.add("grant_location", location.toString());
             if (grantCreationResponse.getGrant() != null) {
                 LoggingUtils.logEnabledMDC(grantCreationResponse.toString(), MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.OK.value(), "200 OK", null), driverRequestId);
+                        RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), responseHeader), driverRequestId);
                 return ResponseEntity.created(location).body(grantCreationResponse.getGrant());
             } else {
                 LoggingUtils.logEnabledMDC(grantCreationResponse.toString(), MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.ACCEPTED.value(), "202 ACCEPTED", null), driverRequestId);
+                        RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), responseHeader), driverRequestId);
                 return ResponseEntity.accepted().location(location).build();
             }
         }else{
             // error case: since grantRequest object payload is null, can't get the driverRequestId and need to log both request received and response sent
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANTS_ENDPOINT, HttpMethod.PATCH.name(), null) , null);
-            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.BAD_REQUEST.value(), "400 BAD REQUeST", null), null);
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANTS_ENDPOINT, HttpMethod.POST.name(), null) , null);
+            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),null, "http",
+                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), null), null);
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping(path = { "/{grantId}" }, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Reads a grant", description = "Returns a previously created grant resource if a granting decision has been made.")
-    public ResponseEntity<Grant> getGrant(@PathVariable String grantId) throws GrantRejectedException, GrantProviderException {
+    public ResponseEntity<Grant> getGrant(@PathVariable String grantId, @RequestHeader HttpHeaders headers) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant fetch for id [{}]", grantId);
         UUID uuid = UUID.randomUUID();
         Grant grant = grantService.getGrant(grantId);
         if (grant != null) {
             // The below line is intended to add the request received log after getting the grant object, so that the driverRequestId can be added for both request received and response sent
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), null), grant.getVnfLcmOpOccId());
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), headers), grant.getVnfLcmOpOccId());
             LoggingUtils.logEnabledMDC(grant.toString(), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.OK.value(), "200 OK", null), grant.getVnfLcmOpOccId());
+                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), null), grant.getVnfLcmOpOccId());
             return ResponseEntity.ok(grant);
         } else {
             // grant object is null, so can't have driverRequestId in this case.
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), null), null);
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), headers), null);
             LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.ACCEPTED.value(), "202 ACCEPTED", null), null);
+                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), null), null);
             return ResponseEntity.accepted().build();
         }
     }

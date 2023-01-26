@@ -86,21 +86,21 @@ public class GrantDriver {
             try {
                 responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.POST, requestEntity, Grant.class);
             } catch (SOL003ResponseException e) {
-                LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), "500 INTERNAL_SERVER_SERVER", null),driverRequestId);
+                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),null, "http",
+                        RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null),driverRequestId);
                 throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s] which gave status %s", url, e.getProblemDetails().getStatus()), e);
             } catch (Exception e) {
-                LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), "500 INTERNAL_SERVER_SERVER", null),driverRequestId);
+                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),null, "http",
+                        RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null),driverRequestId);
                 throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s]", url), e);
             } catch (Throwable e){
                 // To log all unknown errors while making external call
-                LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), "500 INTERNAL_SERVER_SERVER", null),driverRequestId);
+                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),null, "http",
+                        RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null),driverRequestId);
                 throw e;
             }
             LoggingUtils.logEnabledMDC(responseEntity.getBody() != null ? responseEntity.getBody().toString() : null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase().toString(),null),driverRequestId);
+                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase(),null),driverRequestId);
             if (HttpStatus.CREATED.equals(responseEntity.getStatusCode())) {
                 // synchronous response - should find grant resource in body
                 if (responseEntity.getBody() == null) {
@@ -154,17 +154,17 @@ public class GrantDriver {
         try {
             responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.GET, requestEntity, Grant.class, grantId);
         } catch (SOL003ResponseException e) {
-            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(),"500 INTERNAL_SERVER_SERVER", null),null);
+            LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),null, "http",
+                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(),HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null),null);
             throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s] which gave status %s", url, e.getProblemDetails().getStatus()), e);
         } catch (Exception e) {
-            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(),"500 INTERNAL_SERVER_SERVER", null),null);
+            LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),null, "http",
+                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(),HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null),null);
             throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s]", url), e);
         } catch (Throwable e){
             // To log all unknown errors while making external call
-            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(),"500 INTERNAL_SERVER_SERVER", null),null);
+            LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),null, "http",
+                    RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(),HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null),null);
             throw e;
         }
         LoggingUtils.logEnabledMDC(responseEntity.getBody() != null ? responseEntity.getBody().toString() : null, MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",

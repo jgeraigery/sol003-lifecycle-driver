@@ -10,14 +10,9 @@ import com.accantosystems.stratoss.vnfmdriver.utils.RequestResponseLogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionStatus;
@@ -28,8 +23,6 @@ import org.etsi.sol003.lifecyclemanagement.VnfLcmOperationOccurenceNotification;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
 import io.swagger.v3.oas.annotations.Operation;
-
-
 
 @RestController("LifecycleNotificationController")
 @RequestMapping(LifecycleNotificationController.NOTIFICATIONS_URI)
@@ -46,14 +39,15 @@ public class LifecycleNotificationController {
 
     @PostMapping
     @Operation(summary  = "Receives a lifecycle operation occurrence notification from a VNFM")
-    public ResponseEntity<Void> receiveNotification(@RequestBody LifecycleManagementNotification notification) {
+    public ResponseEntity<Void> receiveNotification(@RequestBody LifecycleManagementNotification notification, @RequestHeader HttpHeaders headers) {
         // TODO This should be reduced to DEBUG level, but it assists in development testing to see all notification messages being received
         logger.info("Received notification:\n{}", notification);
         UUID uuid = UUID.randomUUID();
 
         if (notification instanceof VnfLcmOperationOccurenceNotification) {
             final VnfLcmOperationOccurenceNotification vnfLcmOpOccNotification = (VnfLcmOperationOccurenceNotification) notification;
-            LoggingUtils.logEnabledMDC(notification.toString(), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http", RequestResponseLogUtils.getRequestReceivedProtocolMetaData(NOTIFICATIONS_URI) ,vnfLcmOpOccNotification.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(notification.toString(), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(NOTIFICATIONS_URI, HttpMethod.POST.name(), headers) ,vnfLcmOpOccNotification.getVnfLcmOpOccId());
             // Send an update if this is completed
             if (vnfLcmOpOccNotification.getNotificationStatus() == VnfLcmOperationOccurenceNotification.NotificationStatus.RESULT){
                 ExecutionAsyncResponse asyncResponse = new ExecutionAsyncResponse(vnfLcmOpOccNotification.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap());
@@ -67,7 +61,8 @@ public class LifecycleNotificationController {
                 }
                 externalMessagingService.sendExecutionAsyncResponse(asyncResponse);
             }
-            LoggingUtils.logEnabledMDC(notification.toString(), MessageType.RESPONSE, MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.NO_CONTENT.value()),vnfLcmOpOccNotification.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",
+                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.NO_CONTENT.value(),HttpStatus.NO_CONTENT.getReasonPhrase(), null),vnfLcmOpOccNotification.getVnfLcmOpOccId());
         }
 
         return ResponseEntity.noContent().build();
