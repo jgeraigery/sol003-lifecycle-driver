@@ -86,16 +86,16 @@ public class GrantDriver {
             try {
                 responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.POST, requestEntity, Grant.class);
             } catch (SOL003ResponseException e) {
-                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED,uuid.toString(), null, "http",
+                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                         RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), driverRequestId);
                 throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s] which gave status %s", url, e.getProblemDetails().getStatus()), e);
             } catch (Exception e) {
-                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED,uuid.toString(), null, "http",
+                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                         RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), driverRequestId);
                 throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s]", url), e);
             } catch (Throwable e){
                 // To log all unknown errors while making external call
-                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED,uuid.toString(), null, "http",
+                LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                         RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), driverRequestId);
                 throw e;
             }

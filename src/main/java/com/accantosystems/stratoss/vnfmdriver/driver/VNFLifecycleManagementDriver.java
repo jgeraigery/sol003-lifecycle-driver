@@ -111,11 +111,11 @@ public class VNFLifecycleManagementDriver {
             responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
         } catch (Throwable e){
             // To log all unknown errors while making external call
-            LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(),null,"http",
+            LoggingUtils.logEnabledMDC(e.getMessage(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                     RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), driverrequestid);
             throw e;
         }
-        LoggingUtils.logEnabledMDC(responseEntity.getBody(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(),"http",
+        LoggingUtils.logEnabledMDC(responseEntity.getBody(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
                 RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase(), responseEntity.getHeaders()), driverrequestid);
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
@@ -534,7 +534,7 @@ public class VNFLifecycleManagementDriver {
         uriVariables.put("subscriptionId", subscriptionId);
         UUID uuid = UUID.randomUUID();
         LoggingUtils.logEnabledMDC(subscriptionId, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                RequestResponseLogUtils.getRequestSentProtocolMetaData(url,HttpMethod.DELETE.name(), headers) , null);
+                RequestResponseLogUtils.getRequestSentProtocolMetaData(url, HttpMethod.DELETE.name(), headers) , null);
         final ResponseEntity<Void> responseEntity;
         try {
             responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
