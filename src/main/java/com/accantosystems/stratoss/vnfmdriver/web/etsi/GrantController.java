@@ -58,11 +58,11 @@ public class GrantController {
             responseHeader.add("grant_location", location.toString());
             if (grantCreationResponse.getGrant() != null) {
                 LoggingUtils.logEnabledMDC(grantCreationResponse.toString(), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), responseHeader), driverRequestId);
+                        RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), responseHeader), driverRequestId);
                 return ResponseEntity.created(location).body(grantCreationResponse.getGrant());
             } else {
                 LoggingUtils.logEnabledMDC(grantCreationResponse.toString(), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                        RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), responseHeader), driverRequestId);
+                        RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), responseHeader), driverRequestId);
                 return ResponseEntity.accepted().location(location).build();
             }
         }else{
@@ -70,7 +70,7 @@ public class GrantController {
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
                     RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANTS_ENDPOINT, HttpMethod.POST.name(), null), null);
             LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), null, "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), null), null);
+                    RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), null), null);
             return ResponseEntity.badRequest().build();
         }
     }
@@ -86,14 +86,14 @@ public class GrantController {
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
                     RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), headers), grant.getVnfLcmOpOccId());
             LoggingUtils.logEnabledMDC(grant.toString(), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), null), grant.getVnfLcmOpOccId());
+                    RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), null), grant.getVnfLcmOpOccId());
             return ResponseEntity.ok(grant);
         } else {
             // grant object is null, so can't have driverRequestId in this case.
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON.toString(), "http",
                     RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), headers), null);
             LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), null, "http",
-                    RequestResponseLogUtils.getResponseSentProtocolMetadata(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), null), null);
+                    RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), null), null);
             return ResponseEntity.accepted().build();
         }
     }

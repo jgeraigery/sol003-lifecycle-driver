@@ -48,6 +48,12 @@ public abstract class TestConstants {
 
     public static final HttpEntity<String> EMPTY_JSON_ENTITY;
 
+    public static final String LOG_META_DATA_HTTP_URI= "uri";
+    public static final String LOG_META_DATA_HTTP_METHOD= "method";
+    public static final String LOG_META_DATA_HTTP_STATUS_CODE= "status_code";
+    public static final String LOG_META_DATA_HTTP_STATUS_REASON= "status_reason_phrase";
+    public static final String LOG_META_DATA_HTTP_HEADERS= "headers";
+
     static {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
