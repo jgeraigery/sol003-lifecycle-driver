@@ -1,5 +1,9 @@
 package com.accantosystems.stratoss.vnfmdriver.utils;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
@@ -42,5 +46,14 @@ public class RequestResponseLogUtils {
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_REASON, statusReasonPhrase);
         protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, headers);
         return protocolMetadata;
+    }
+
+    public static String convertToJson(String message){
+        ObjectMapper jsonMapper = new ObjectMapper();
+        try {
+            return jsonMapper.writeValueAsString(message);
+        } catch (JsonProcessingException e) {
+            throw  new SOL003ResponseException("Error in parsing protocol_metadata "+ message, e);
+        }
     }
 }
