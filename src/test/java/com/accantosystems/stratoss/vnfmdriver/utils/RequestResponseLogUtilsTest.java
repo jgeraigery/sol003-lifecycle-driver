@@ -117,4 +117,30 @@ public class RequestResponseLogUtilsTest {
         assertThat(responseSentMetadata.get(TestConstants.LOG_META_DATA_HTTP_STATUS_REASON)).isEqualTo("Internal Server Error");
         assertThat(responseSentMetadata.get(TestConstants.LOG_META_DATA_HTTP_HEADERS)).isNotEqualTo(null);
     }
+    @Test
+    public void testFilteringConfidentialInfoInHeaders(){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.put(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION, List.of("authorization value"));
+        headers.put(TestConstants.LOG_META_DATA_HTTP_HEADERS_SET_COOKIE, List.of("Cookie value"));
+        Map<String, Object> responseReceivedProtocolMetaData = RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.CREATED.value(), HttpStatus.CREATED.getReasonPhrase(), headers);
+        HttpHeaders responseReceivedProtocolMetaDataHeaders = (HttpHeaders) responseReceivedProtocolMetaData.get(TestConstants.LOG_META_DATA_HTTP_HEADERS);
+        assertThat(responseReceivedProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+        assertThat(responseReceivedProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+
+        Map<String, Object> requestSentProtocolMetaData = RequestResponseLogUtils.getRequestSentProtocolMetaData("uri", HttpMethod.GET.name(), headers);
+        HttpHeaders requestSentProtocolMetaDataHeaders = (HttpHeaders) requestSentProtocolMetaData.get(TestConstants.LOG_META_DATA_HTTP_HEADERS);
+        assertThat(requestSentProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+        assertThat(requestSentProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+
+        Map<String, Object> requestReceivedProtocolMetaData = RequestResponseLogUtils.getRequestReceivedProtocolMetaData("uri", HttpMethod.DELETE.name(), headers);
+        HttpHeaders requestReceivedProtocolMetaDataHeaders = (HttpHeaders) requestReceivedProtocolMetaData.get(TestConstants.LOG_META_DATA_HTTP_HEADERS);
+        assertThat(requestReceivedProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+        assertThat(requestReceivedProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+
+        Map<String, Object> responseSentProtocolMetaData = RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), headers);
+        HttpHeaders responseSentProtocolMetaDataHeaders = (HttpHeaders) responseSentProtocolMetaData.get(TestConstants.LOG_META_DATA_HTTP_HEADERS);
+        assertThat(responseSentProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+        assertThat(responseSentProtocolMetaDataHeaders.get(TestConstants.LOG_META_DATA_HTTP_HEADERS_AUTHORIZATION)).isEqualTo(null);
+    }
 }

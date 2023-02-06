@@ -31,6 +31,7 @@ public class GrantController {
 
     private final static Logger logger = LoggerFactory.getLogger(GrantController.class);
 
+    public final static String LOG_URI_PREFIX = "...";
     public static final String GRANTS_ENDPOINT = "/grant/v1/grants";
     private static final String GRANT_LOCATION = GrantController.GRANTS_ENDPOINT + "/{grantId}";
 
@@ -49,19 +50,19 @@ public class GrantController {
         final String driverRequestId;
         if(grantRequest != null){
             driverRequestId = grantRequest.getVnfLcmOpOccId();
-            LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grantRequest.toString()), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANTS_ENDPOINT, HttpMethod.POST.name(), headers), driverRequestId);
+            LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grantRequest), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(LOG_URI_PREFIX+GRANTS_ENDPOINT, HttpMethod.POST.name(), headers), driverRequestId);
             GrantCreationResponse grantCreationResponse = grantService.requestGrant(grantRequest);
             final ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
             URI location = uriBuilder.path(GRANT_LOCATION).buildAndExpand(grantCreationResponse.getGrantId()).toUri();
             HttpHeaders responseHeader = new HttpHeaders();
-            responseHeader.add("grant_location", location.toString());
+            responseHeader.add("location", location.toString());
             if (grantCreationResponse.getGrant() != null) {
-                LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grantCreationResponse.toString()), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+                LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grantCreationResponse), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                         RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), responseHeader), driverRequestId);
                 return ResponseEntity.created(location).body(grantCreationResponse.getGrant());
             } else {
-                LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grantCreationResponse.toString()), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+                LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grantCreationResponse), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                         RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.getReasonPhrase(), responseHeader), driverRequestId);
                 return ResponseEntity.accepted().location(location).build();
             }
@@ -85,7 +86,7 @@ public class GrantController {
             // The below line is intended to add the request received log after getting the grant object, so that the driverRequestId can be added for both request received and response sent
             LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                     RequestResponseLogUtils.getRequestReceivedProtocolMetaData(GRANT_LOCATION, HttpMethod.GET.name(), headers), grant.getVnfLcmOpOccId());
-            LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grant.toString()), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+            LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(grant), MessageType.RESPONSE, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                     RequestResponseLogUtils.getResponseSentProtocolMetaData(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), null), grant.getVnfLcmOpOccId());
             return ResponseEntity.ok(grant);
         } else {

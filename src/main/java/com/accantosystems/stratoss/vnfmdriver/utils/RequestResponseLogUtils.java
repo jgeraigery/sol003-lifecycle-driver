@@ -3,11 +3,15 @@ package com.accantosystems.stratoss.vnfmdriver.utils;
 import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.MDC;
-import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.http.HttpHeaders;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RequestResponseLogUtils {
     public static final String LOG_META_DATA_HTTP_URI= "uri";
@@ -15,45 +19,63 @@ public class RequestResponseLogUtils {
     public static final String LOG_META_DATA_HTTP_STATUS_CODE= "status_code";
     public static final String LOG_META_DATA_HTTP_STATUS_REASON= "status_reason_phrase";
     public static final String LOG_META_DATA_HTTP_HEADERS= "headers";
-    public static Map<String,Object> getResponseReceivedProtocolMetaData(int statusCode, String statusReasonPhrase, Object headers){
+    public static Map<String,Object> getResponseReceivedProtocolMetaData(int statusCode, String statusReasonPhrase, HttpHeaders headers){
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_CODE,statusCode);
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_REASON, statusReasonPhrase);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, headers);
+        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
         return protocolMetadata;
 
     }
 
-    public static Map<String,Object> getRequestSentProtocolMetaData(String uri, String method, Object headers){
+    public static Map<String,Object> getRequestSentProtocolMetaData(String uri, String method, HttpHeaders headers){
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_URI,uri);
         protocolMetadata.put(LOG_META_DATA_HTTP_METHOD, method);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, headers);
+        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
         return protocolMetadata;
     }
 
-    public static Map<String,Object> getRequestReceivedProtocolMetaData(String uri, String method, Object headers){
+    public static Map<String,Object> getRequestReceivedProtocolMetaData(String uri, String method, HttpHeaders headers){
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_URI, uri);
         protocolMetadata.put(LOG_META_DATA_HTTP_METHOD, method);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, headers);
+        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
         return protocolMetadata;
     }
 
-    public static Map<String,Object> getResponseSentProtocolMetaData(int status_code, String statusReasonPhrase, Object headers){
+    public static Map<String,Object> getResponseSentProtocolMetaData(int status_code, String statusReasonPhrase, HttpHeaders headers){
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_CODE,status_code);
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_REASON, statusReasonPhrase);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, headers);
+        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
         return protocolMetadata;
     }
 
-    public static String convertToJson(String message){
-        ObjectMapper jsonMapper = new ObjectMapper();
+    public static HttpHeaders filterConfidentialData(HttpHeaders headers){
+        final HttpHeaders filteredHeaders = new HttpHeaders();
+        if(headers!=null && (headers.containsKey("authorization") || headers.containsKey("Set-Cookie"))) {
+            Set headerNames = headers.keySet();
+            List<String> filteredHeaderNames = (List<String>) headerNames.stream().filter(header -> !header.equals("authorization") && !header.equals("Set-Cookie")).collect(Collectors.toList());
+            filteredHeaderNames.forEach(header -> {
+                filteredHeaders.put(header, headers.get(header));
+            });
+            return filteredHeaders;
+        }else{
+            return headers;
+        }
+
+    }
+
+    public static String convertToJson(Object message){
+        //ObjectMapper jsonMapper = new ObjectMapper();
+        ObjectMapper jsonMapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
         try {
             return jsonMapper.writeValueAsString(message);
         } catch (JsonProcessingException e) {
-            throw  new SOL003ResponseException("Error in parsing protocol_metadata "+ message, e);
+            throw  new SOL003ResponseException("Error in parsing Object "+ message, e);
         }
     }
 }

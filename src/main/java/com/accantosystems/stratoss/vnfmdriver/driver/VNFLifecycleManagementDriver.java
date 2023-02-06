@@ -104,7 +104,7 @@ public class VNFLifecycleManagementDriver {
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<String> requestEntity = new HttpEntity<>(createVnfRequest, headers);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(createVnfRequest), MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(createVnfRequest, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                 RequestResponseLogUtils.getRequestSentProtocolMetaData(url, HttpMethod.POST.name(), headers), driverrequestid);
         final ResponseEntity<String> responseEntity;
         try {
@@ -115,7 +115,7 @@ public class VNFLifecycleManagementDriver {
                     RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), driverrequestid);
             throw e;
         }
-        LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(responseEntity.getBody()), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(responseEntity.getBody(), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                 RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase(), responseEntity.getHeaders()), driverrequestid);
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
@@ -376,7 +376,7 @@ public class VNFLifecycleManagementDriver {
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<String> requestEntity = new HttpEntity<>(operationRequest, headers);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(operationRequest), MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(operationRequest, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
                 RequestResponseLogUtils.getRequestSentProtocolMetaData(url, HttpMethod.POST.name(), headers) , null);
         final ResponseEntity<String> responseEntity;
         try {

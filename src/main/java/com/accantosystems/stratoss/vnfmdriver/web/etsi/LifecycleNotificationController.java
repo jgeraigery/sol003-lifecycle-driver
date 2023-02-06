@@ -29,7 +29,8 @@ import io.swagger.v3.oas.annotations.Operation;
 public class LifecycleNotificationController {
 
     private final static Logger logger = LoggerFactory.getLogger(LifecycleNotificationController.class);
-    public final static String NOTIFICATIONS_URI="/vnflcm/v2/notifications";
+    public final static String NOTIFICATIONS_URI = "/vnflcm/v2/notifications";
+    public final static String LOG_URI_PREFIX = "...";
     private final ExternalMessagingService externalMessagingService;
 
     @Autowired
@@ -46,8 +47,8 @@ public class LifecycleNotificationController {
 
         if (notification instanceof VnfLcmOperationOccurenceNotification) {
             final VnfLcmOperationOccurenceNotification vnfLcmOpOccNotification = (VnfLcmOperationOccurenceNotification) notification;
-            LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(notification.toString()), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
-                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(NOTIFICATIONS_URI, HttpMethod.POST.name(), headers), vnfLcmOpOccNotification.getVnfLcmOpOccId());
+            LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(notification), MessageType.REQUEST, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+                    RequestResponseLogUtils.getRequestReceivedProtocolMetaData(LOG_URI_PREFIX+NOTIFICATIONS_URI, HttpMethod.POST.name(), headers), vnfLcmOpOccNotification.getVnfLcmOpOccId());
             // Send an update if this is completed
             if (vnfLcmOpOccNotification.getNotificationStatus() == VnfLcmOperationOccurenceNotification.NotificationStatus.RESULT){
                 ExecutionAsyncResponse asyncResponse = new ExecutionAsyncResponse(vnfLcmOpOccNotification.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap());
