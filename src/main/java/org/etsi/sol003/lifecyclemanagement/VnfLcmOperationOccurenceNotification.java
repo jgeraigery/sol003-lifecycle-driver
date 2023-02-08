@@ -3,6 +3,7 @@ package org.etsi.sol003.lifecyclemanagement;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.etsi.sol003.common.ProblemDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -31,6 +32,7 @@ public class VnfLcmOperationOccurenceNotification implements LifecycleManagement
     @Schema(name = "Subscription Id", required = true, description = "Identifier of the subscription that this notification relates to.")
     private String subscriptionId;
     @Schema(name = "Notification Time", required = true, description = "Date-time of the generation of the notification.")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private OffsetDateTime timeStamp;
     @Schema(name = "Notification Status", required = true, description = "Indicates whether this notification reports about the start of a lifecycle operation or the result of a lifecycle operation.")
     private NotificationStatus notificationStatus;
