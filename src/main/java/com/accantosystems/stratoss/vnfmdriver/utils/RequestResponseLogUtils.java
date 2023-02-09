@@ -3,6 +3,7 @@ package com.accantosystems.stratoss.vnfmdriver.utils;
 import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +24,9 @@ public class RequestResponseLogUtils {
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_CODE,statusCode);
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_REASON, statusReasonPhrase);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        if(headers!=null && headers.size()>0) {
+            protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        }
         return protocolMetadata;
 
     }
@@ -32,7 +35,9 @@ public class RequestResponseLogUtils {
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_URI,uri);
         protocolMetadata.put(LOG_META_DATA_HTTP_METHOD, method);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        if(headers!=null && headers.size()>0) {
+            protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        }
         return protocolMetadata;
     }
 
@@ -40,7 +45,9 @@ public class RequestResponseLogUtils {
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_URI, uri);
         protocolMetadata.put(LOG_META_DATA_HTTP_METHOD, method);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        if(headers!=null && headers.size()>0) {
+            protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        }
         return protocolMetadata;
     }
 
@@ -48,7 +55,9 @@ public class RequestResponseLogUtils {
         Map<String,Object> protocolMetadata=new HashMap<>();
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_CODE,status_code);
         protocolMetadata.put(LOG_META_DATA_HTTP_STATUS_REASON, statusReasonPhrase);
-        protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        if(headers!=null && headers.size()>0) {
+            protocolMetadata.put(LOG_META_DATA_HTTP_HEADERS, filterConfidentialData(headers));
+        }
         return protocolMetadata;
     }
 
@@ -68,10 +77,10 @@ public class RequestResponseLogUtils {
     }
 
     public static String convertToJson(Object message){
-        //ObjectMapper jsonMapper = new ObjectMapper();
         ObjectMapper jsonMapper = JsonMapper.builder()
                 .addModule(new JavaTimeModule())
                 .build();
+        jsonMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try {
             return jsonMapper.writeValueAsString(message);
         } catch (JsonProcessingException e) {

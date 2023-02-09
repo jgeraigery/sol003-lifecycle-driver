@@ -29,7 +29,6 @@ public class VnfIdentifierDeletionNotification implements LifecycleManagementNot
     @Schema(name = "Subscription Id", required = true, description = "Identifier of the subscription that this notification relates to.")
     private String subscriptionId;
     @Schema(name = "Notification Time", required = true, description = "Date-time of the generation of the notification.")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private OffsetDateTime timeStamp;
     @Schema(name = "VNF Instance Id", required = true, description = "The created VNF instance identifier.")
     private String vnfInstanceId;
