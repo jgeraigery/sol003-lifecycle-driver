@@ -3,6 +3,7 @@ package org.etsi.sol003.lifecyclemanagement;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.etsi.sol003.common.ProblemDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

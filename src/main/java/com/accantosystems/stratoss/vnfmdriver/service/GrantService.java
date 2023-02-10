@@ -54,6 +54,8 @@ public class GrantService {
             // for now the grant response will only contain the id. Not yet sure what else it needs
             Grant grant = new Grant();
             grant.setId(UUID.randomUUID().toString());
+            //grant.setVnfInstanceId(grantRequest.getVnfInstanceId());
+            //grant.setVnfLcmOpOccId(grantRequest.getVnfLcmOpOccId());
             grantCreationResponse = new GrantCreationResponse(grant);
             logger.info("Auto-authorised grant for operation to {} VNF instance [{}]", grantRequest.getOperation(), grantRequest.getVnfInstanceId());
         } else {
