@@ -138,14 +138,15 @@ public class VNFLifecycleManagementDriver {
      * @throws SOL003ResponseException if there are any errors deleting the VNF instance
      */
     public void deleteVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String driverrequestid) throws SOL003ResponseException {
-        final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES + "/{vnfInstanceId}";
+        final String baseUrl = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES;
+        final String url = baseUrl + "/{vnfInstanceId}";
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("vnfInstanceId", vnfInstanceId);
         UUID uuid = UUID.randomUUID();
         LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), null, "http",
-                RequestResponseLogUtils.getRequestSentProtocolMetaData(url, HttpMethod.DELETE.name(), headers), driverrequestid);
+                RequestResponseLogUtils.getRequestSentProtocolMetaData(baseUrl+"/"+vnfInstanceId, HttpMethod.DELETE.name(), headers), driverrequestid);
         final ResponseEntity<Void> responseEntity;
         try {
             responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
