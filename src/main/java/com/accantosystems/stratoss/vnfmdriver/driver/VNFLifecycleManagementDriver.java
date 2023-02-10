@@ -144,7 +144,7 @@ public class VNFLifecycleManagementDriver {
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("vnfInstanceId", vnfInstanceId);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), null, "http",
                 RequestResponseLogUtils.getRequestSentProtocolMetaData(url, HttpMethod.DELETE.name(), headers), driverrequestid);
         final ResponseEntity<Void> responseEntity;
         try {
@@ -155,7 +155,7 @@ public class VNFLifecycleManagementDriver {
                     RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), driverrequestid);
             throw e;
         }
-        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                 RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase(), responseEntity.getHeaders()), driverrequestid);
         checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
@@ -395,7 +395,7 @@ public class VNFLifecycleManagementDriver {
         }
         // Return the VnfLcmOpOccId, which is the last part of the path
         final String requestId = location.getPath().substring(location.getPath().lastIndexOf("/") + 1);
-        LoggingUtils.logEnabledMDC(RequestResponseLogUtils.convertToJson(responseEntity.getBody()), MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                 RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase(), responseEntity.getHeaders()), requestId);
         return requestId;
     }
@@ -533,7 +533,7 @@ public class VNFLifecycleManagementDriver {
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("subscriptionId", subscriptionId);
         UUID uuid = UUID.randomUUID();
-        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST, MessageDirection.SENT, uuid.toString(), null, "http",
                 RequestResponseLogUtils.getRequestSentProtocolMetaData(url, HttpMethod.DELETE.name(), headers) , null);
         final ResponseEntity<Void> responseEntity;
         try {
@@ -544,7 +544,7 @@ public class VNFLifecycleManagementDriver {
                     RequestResponseLogUtils.getResponseReceivedProtocolMetaData(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null), null);
             throw e;
         }
-        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), MediaType.APPLICATION_JSON_VALUE, "http",
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE, MessageDirection.RECEIVED, uuid.toString(), null, "http",
                 RequestResponseLogUtils.getResponseReceivedProtocolMetaData(responseEntity.getStatusCodeValue(), responseEntity.getStatusCode().getReasonPhrase(), responseEntity.getHeaders()), null);
         checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
