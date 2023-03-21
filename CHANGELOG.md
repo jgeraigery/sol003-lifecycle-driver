@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.6.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.6.0) (2023-03-21)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.5.3...0.6.0)
+
+**Implemented enhancements:**
+
+- Logging issues in sol003 driver
+- Update to Java 17 for sol003-lifecycle-driver
+- Mask password in the log message of ExecutionRequest
+- Released images should use prod profile instead of dev profile
+- Security Vulnerability Fixes
+
 ## [0.5.3](https://github.com/IBM/sol003-lifecycle-driver/tree/0.5.3) (2022-12-08)
 [Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.5.2...0.5.3)
 

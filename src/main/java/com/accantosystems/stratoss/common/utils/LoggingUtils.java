@@ -65,7 +65,9 @@ public class LoggingUtils {
         try{
             MDC.put(LOG_MESSAGE_DIRECTION_KEY, messageDirection.toString());
             MDC.put(LOG_EXTERNAL_REQUEST_ID_KEY, externalRequestId);
-            MDC.put(LOG_CONTENT_TYPE_KEY, contentType);
+            if(contentType!=null) {
+                MDC.put(LOG_CONTENT_TYPE_KEY, contentType);
+            }
             MDC.put(LOG_PROTOCOL_KEY, protocol.toLowerCase());
             ObjectMapper jsonMapper = new ObjectMapper();
             try {
