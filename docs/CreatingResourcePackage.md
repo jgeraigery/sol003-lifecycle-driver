@@ -24,7 +24,7 @@ helloworld.zip
                +--- HealVnfRequest.js
                +--- ScaleVnfRequest.js
 ```
-The `resource.yaml` file is the resource descriptor used by LM. Details on the format of this file can be found on the [Stratoss LM Learning Center](http://servicelifecyclemanager.com/).
+The `resource.yaml` file is the resource descriptor used by LM.
 
 The scripts in the `lifecycle/sol003/scripts` directory can be used to override the default behaviour of the driver.
 
