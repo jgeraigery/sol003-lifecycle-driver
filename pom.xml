@@ -44,7 +44,7 @@
         <httpclient.version>4.5.13</httpclient.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <java.version>17</java.version>
-        <kiwigrid.version>2.5</kiwigrid.version>
+        <kiwigrid.version>6.0.0</kiwigrid.version>
         <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
         <maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
